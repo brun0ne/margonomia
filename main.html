@@ -1,0 +1,302 @@
+<html>
+  <head>
+    <title>Margonomia - ceny w Margonem</title>
+
+    <meta name="description" content="Margonomia -- Ceny przedmiotów na aukcjach w Margonem | W czasie rzeczywistym! | Aeather"></head>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+    <meta charset="utf-8">
+
+    <meta name="robots" content="index, archive" />
+
+    <link rel="icon" type="image/png" href="https://cdn.discordapp.com/attachments/661731719354777602/858373001758375966/searchpng.com-gold-coin-png-image.png"/>
+
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300&family=Roboto:wght@100&family=Viaoda+Libre&display=swap');
+
+      body{
+        color: white;
+        background-color: #1b1616;
+        font-family: Consolas, Consolas;
+      }
+
+      #logo{
+        margin: 2%;
+        font-family: 'Fira Sans', sans-serif;
+      }
+
+      #logo_text{
+        letter-spacing: inherit;
+        transition: 0.5s;
+
+        color: white;
+        opacity: 1;
+      }
+
+      #logo_text:hover{
+        letter-spacing: 2;
+        transition: 0.5s;
+        cursor: pointer;
+      }
+
+      #world_choice{
+        margin: 2%;
+        margin-left: 1.5%;
+      }
+
+      #item_choice{
+        margin: 2%;
+        margin-left: 2%;
+        display: flex;
+      }
+
+      #graph{
+        margin: 2%;
+        margin-left: -0.5%;
+        fill: white !important;
+
+        display: flex;
+        justify-content: center;
+      }
+
+      #footer{
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        text-align: center;
+        opacity: 0.5;
+        color: white;
+        font-size: 0.8rem;
+        background-color: rgba(0, 0, 0, 0.5);
+        padding: 2px;
+      }
+
+      #top_right{
+        position: fixed;
+        top: 2%;
+        right: 2%;
+      }
+
+      #about_button{
+        opacity: 0.6;
+      }
+
+      #about_button:hover{
+        opacity: 0.9;
+        cursor: pointer;
+      }
+
+      #about_button_link{
+        opacity: 1;
+        color: white;
+      }
+
+      tspan{
+        fill: white !important;
+      }
+
+      text{
+        fill: white !important;
+      }
+
+      line{
+        stroke: white !important;
+      }
+
+      a{
+        text-decoration: none;
+        color: aqua;
+      }
+
+      a:hover{
+        color: aqua;
+        opacity: 0.7;
+        text-decoration: none;
+      }
+
+      .domain{
+        stroke: white !important;
+      }
+
+      .btn{
+        margin: 0.5%;
+      }
+
+      .mpld3-text{
+        font-family: Consolas, Consolas;
+        opacity: 0 !important;
+      }
+
+      rect{
+        fill: rgba(255, 255, 255, 0) !important;
+      }
+
+      .mpld3-resetbutton, .mpld3-zoombutton, .mpld3-boxzoombutton{
+        filter: invert(100%);
+        opacity: 0.5 !important;
+      }
+
+      .mpld3-resetbutton:hover, .mpld3-zoombutton:hover, .mpld3-boxzoombutton:hover{
+        opacity: 0.7 !important;
+      }
+    </style>
+
+    <script>
+      function sendAJAX(command, args, onload) {
+    		let args_text = "";
+
+    		for (var key in args) {
+    			if (args.hasOwnProperty(key)) {
+    				args_text += key + "=" + args[key] + "&";
+    			}
+    		}
+
+    		const xhttp = new XMLHttpRequest();
+
+    		xhttp.onload = function() {
+    			// console.log(this.responseText);
+
+          onload(this.responseText);
+    		}
+
+    		xhttp.open("GET", "/" + command + "?" + args_text, true);
+    		xhttp.send();
+    	}
+
+      function loadGraph(req){
+        SIZE_X = Math.floor(window.innerWidth/120);
+        SIZE_Y = Math.floor(window.innerHeight/180);
+
+        document.getElementById("item_choice_button").innerHTML = req;
+
+        sendAJAX("get_graph", {item: req, SIZE_X: SIZE_X, SIZE_Y: SIZE_Y}, function(responseText){
+          let parts = atob(responseText).split("<script>");
+
+          document.getElementById("graph").innerHTML = parts[0];
+
+          eval(parts[1].split("<\/script>")[0]);
+        });
+      }
+
+      function getItems(filter){
+        sendAJAX("get_items", {}, function(responseText){
+          let str = "";
+
+          str += `<li><a class="dropdown-item" href="#" onclick="suggestItem()">Zaproponuj przedmiot</a></li><li><hr class="dropdown-divider"></li>`;
+
+          let items = JSON.parse(atob(responseText));
+
+          let count = 0;
+
+          for(let i = 0; i < items.length; i++){
+            if(filter != null && filter != ""){
+              if(!items[i].toLowerCase().includes(filter.toLowerCase()))
+                continue;
+            }
+
+            str += `<li><a class="dropdown-item" href="#" onclick="loadGraph('` + items[i] + `')">` + items[i] + `</a></li>`;
+            count++;
+          }
+
+          document.getElementById("item_choice_list").innerHTML = str;
+
+          if(filter != null && filter != ""){
+            let chosen = document.getElementById("item_choice_button").innerHTML;
+
+            if(!chosen.toLowerCase().includes(filter.toLowerCase()) && count == 1){
+              loadGraph(str.split("loadGraph('")[1].split(`')">`)[0]);
+            }
+          }
+        });
+      }
+
+      function itemFilter(){
+        let text = document.getElementById("input_item_filter").value;
+
+        getItems(text);
+      }
+
+      function suggestItem(){
+        let suggestion = prompt("Zaproponuj przedmiot do dodania na listę");
+
+        if(suggestion == "" || suggestion == null)
+          return false;
+
+        sendAJAX("suggestion", {text: suggestion});
+
+        alert("Dzięki za twoją wspaniałą propozycję :D");
+      }
+
+      window.onload = function(){
+        getItems();
+      }
+    </script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NTRQZG13EZ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-NTRQZG13EZ');
+    </script>
+  </head>
+
+  <body>
+    <div id="particles-js" style="position: fixed; left: 0: top: 0; width: 100%; height: 100%; pointer-events: none;"></div>
+
+    <script src="particles.min.js"></script>
+    <script>
+      /* particlesJS.load(@dom-id, @path-json, @callback (optional)); */
+      particlesJS.load('particles-js', 'particles.config.json', function() {
+        // console.log('particles.js config loaded');
+      });
+    </script>
+
+    <div id="logo">
+      <a id="logo_text" href="/">
+        <h1 style="font-size: 2rem;">
+          Margonomia
+        </h1>
+      </a>
+    </div>
+
+    <div id="top_right">
+      <a id="about_button_link" href="/about">
+        <svg id="about_button" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16">
+          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+          <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+        </svg>
+      </a>
+    </div>
+
+    <div id="world_choice">
+      <button type="button" class="btn btn-primary">Aether</button>
+    </div>
+
+    <div class="input-group mb-3" style="width: 20%; margin-left: 2%;">
+      <span class="input-group-text" id="basic-addon1">Filtruj nazwę</span>
+      <input id="input_item_filter" onchange="itemFilter()" type="text" class="form-control" placeholder="Itemek" aria-label="item-filter" aria-describedby="basic-addon1">
+    </div>
+
+    <div id="item_choice">
+      <div class="btn-group">
+        <button id="item_choice_button" data-bs-display="static" data-bs-flip="false" type="button" class="btn btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          Wybierz item
+        </button>
+        <ul class="dropdown-menu" id="item_choice_list" style="max-height: 300px; overflow-y: scroll; overflow-x: hidden;">
+
+        </ul>
+      </div>
+    </div>
+
+    <div id="graph"></div>
+
+    <div id="footer">insanely coded by <a href="https://github.com/brun0ne" target="_blank">brun0ne</a> | <a href="https://tipo.live/p/brun0ne" target="_blank">✨donate✨</a></div>
+
+    <div id="description" style="display: none;">Margonomia - ceny przedmiotów, aukcje na żywo w czasie rzeczywistym, giełda. Margonem to polska darmowa graficzna gra MMORPG</div>
+  </body>
+</html>

@@ -1,0 +1,40 @@
+Working
+Traceback (most recent call last):
+  File "bot.py", line 14, in <module>
+    driver = webdriver.Chrome(executable_path="chromedriver", options=chrome_options)
+  File "/home/ec2-user/margonomia/bot/selenium/webdriver/chrome/webdriver.py", line 81, in __init__
+    desired_capabilities=desired_capabilities)
+  File "/home/ec2-user/margonomia/bot/selenium/webdriver/remote/webdriver.py", line 157, in __init__
+    self.start_session(capabilities, browser_profile)
+  File "/home/ec2-user/margonomia/bot/selenium/webdriver/remote/webdriver.py", line 252, in start_session
+    response = self.execute(Command.NEW_SESSION, parameters)
+  File "/home/ec2-user/margonomia/bot/selenium/webdriver/remote/webdriver.py", line 321, in execute
+    self.error_handler.check_response(response)
+  File "/home/ec2-user/margonomia/bot/selenium/webdriver/remote/errorhandler.py", line 242, in check_response
+    raise exception_class(message, screen, stacktrace)
+selenium.common.exceptions.WebDriverException: Message: unknown error: Chrome failed to start: exited abnormally.
+  (unknown error: DevToolsActivePort file doesn't exist)
+  (The process started from chrome location /usr/bin/chromium-browser is no longer running, so ChromeDriver is assuming that Chrome has crashed.)
+
+Working
+Working
+Working
+Working
+Working
+Working
+Sun Jun 27 20:50:52 CEST 2021
+Working
+Sun Jun 27 21:08:01 CEST 2021
+Sun Jun 27 21:15:01 CEST 2021
+Sun Jun 27 21:18:01 CEST 2021
+Working
+Sun Jun 27 21:30:01 CEST 2021
+Working
+Sun Jun 27 21:32:08 CEST 2021
+Working
+Sun Jun 27 21:45:01 CEST 2021
+Working
+Sun Jun 27 22:00:02 CEST 2021
+Working
+Sun Jun 27 22:19:13 CEST 2021
+Working
