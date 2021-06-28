@@ -16,10 +16,15 @@ import base64
 
 import os
 
+import stats
+
+import importlib
+
 hostName = "0.0.0.0"
 serverPort = 443
 
 # BiegnacyDzik
+# PlywajacyKrolik
 
 class MyServer(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -27,6 +32,8 @@ class MyServer(BaseHTTPRequestHandler):
         self.send_header("Content-type", "text/html")
         self.send_header("Access-Control-Allow-Origin", "https://aether.margonem.pl")
         self.end_headers()
+
+        # print(self.headers)
 
         COMMAND = urlparse(self.path).path[1:]
 
@@ -55,6 +62,11 @@ class MyServer(BaseHTTPRequestHandler):
             self.wfile.write(bytes(open("particles.min.js").read(), "utf-8"))
         elif COMMAND == "particles.config.json":
             self.wfile.write(bytes(open("particles.config.json").read(), "utf-8"))
+        elif COMMAND == "suggestions":
+            self.wfile.write(bytes("<html><head><meta charset='utf-8'></head><body>" + open("suggestions.txt").read() + "</body></html>", "utf-8"))
+        elif COMMAND == "stats":
+            importlib.reload(stats)
+            self.wfile.write(bytes(stats.stats_f(["", "-c"]), "utf-8"))
         elif COMMAND == "":
             self.main(args)
 

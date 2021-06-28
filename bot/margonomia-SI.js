@@ -254,6 +254,14 @@
 		{
 			name: "Kolczuga straży honorowej",
 			type: "zbroje"
+		},
+		{
+			name: "Przebicie ślepego wąwozu",
+			type: "dystansowe"
+		},
+		{
+			name: "Maska złodzieja",
+			type: "hełmy"
 		}
 	];
 
