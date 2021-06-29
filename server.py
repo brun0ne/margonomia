@@ -23,6 +23,8 @@ import importlib
 hostName = "0.0.0.0"
 serverPort = 443
 
+PATH = "/home/ec2-user/margonomia/"
+
 # BiegnacyDzik
 # PlywajacyKrolik
 
@@ -59,12 +61,15 @@ class MyServer(BaseHTTPRequestHandler):
         elif COMMAND == "suggestion":
             self.suggestion(args)
         elif COMMAND == "particles.min.js":
-            self.wfile.write(bytes(open("particles.min.js").read(), "utf-8"))
+            self.wfile.write(bytes(open(PATH + "particles.min.js").read(), "utf-8"))
         elif COMMAND == "particles.config.json":
-            self.wfile.write(bytes(open("particles.config.json").read(), "utf-8"))
+            self.wfile.write(bytes(open(PATH + "particles.config.json").read(), "utf-8"))
         elif COMMAND == "suggestions":
-            self.wfile.write(bytes("<html><head><meta charset='utf-8'></head><body>" + open("suggestions.txt").read() + "</body></html>", "utf-8"))
+            self.wfile.write(bytes("<html><head><meta charset='utf-8'></head><body>" + open(PATH + "suggestions.txt").read() + "</body></html>", "utf-8"))
         elif COMMAND == "stats":
+            if args["q"] != "abc123":
+                return False
+
             importlib.reload(stats)
             self.wfile.write(bytes(stats.stats_f(["", "-c"]), "utf-8"))
         elif COMMAND == "":
@@ -87,12 +92,12 @@ class MyServer(BaseHTTPRequestHandler):
 
         s = json.dumps(line)
 
-        file = open("prices/" + filename, "a")
+        file = open(PATH + "prices/" + filename, "a")
         file.write(s + "\n")
         file.close()
 
     def get_graph(self, args):
-        file = open("prices/" + args["item"] + ".prices", "r")
+        file = open(PATH + "prices/" + args["item"] + ".prices", "r")
 
         dates = []
         prices = []
@@ -132,7 +137,7 @@ class MyServer(BaseHTTPRequestHandler):
         plt.close('all')
 
     def get_items(self, args):
-        files = os.listdir("prices/")
+        files = os.listdir(PATH + "prices/")
         files.sort()
         items = []
 
@@ -147,16 +152,16 @@ class MyServer(BaseHTTPRequestHandler):
         if text == "" or text == None:
             return False
 
-        file = open("suggestions.txt", "a")
+        file = open(PATH + "suggestions.txt", "a")
         file.write(unquote(text.replace("\n", "")) + "\n")
         file.close()
 
     def about(self, args):
-        HTML = open("about.html", "r").read()
+        HTML = open(PATH + "about.html", "r").read()
         self.wfile.write(bytes(HTML, "utf-8"))
 
     def main(self, args):
-        HTML = open("main.html", "r").read()
+        HTML = open(PATH + "main.html", "r").read()
         self.wfile.write(bytes(HTML, "utf-8"))
 
 
@@ -164,8 +169,8 @@ if __name__ == "__main__":
     webServer = HTTPServer((hostName, serverPort), MyServer)
 
     webServer.socket = ssl.wrap_socket(webServer.socket,
-         keyfile="key.key",
-         certfile='cert.crt', server_side=True)
+         keyfile=PATH+"key.key",
+         certfile=PATH+'cert.crt', server_side=True)
 
     print("Server started https://%s:%s" % (hostName, serverPort))
 
