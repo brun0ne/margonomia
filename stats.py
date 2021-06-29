@@ -5,6 +5,8 @@ import matplotlib.cm as cm
 
 import sys
 
+PATH = "/home/ec2-user/margonomia/"
+
 def color(s):
     r = lambda x: int(round((float(hash(x) % 256) / 256)*600))
 
@@ -13,7 +15,7 @@ def color(s):
     return '#%02X%02X%02X' % (int(c[0]*100),int(c[1]*100),int(c[2]*100))
 
 def stats_f(args):
-    file = open("server.log", "r")
+    file = open(PATH + "server.log", "r")
 
     lines = file.readlines()
 
@@ -25,16 +27,21 @@ def stats_f(args):
 
     IPs = {}
 
+    prevday = 0
+
     for line in lines:
         if "27/Jun/2021" in line or "28/Jun/2021 01:10" in line: # filter out debug
             continue
 
-        if ("31.2.125.206" not in line) and ("35.178.138.241" not in line) and ("GET /get_graph?item=" in line) :
+        if ("31.2.125.206" not in line) and ("35.178.138.241" not in line) and ("66.249.65." not in line) and ("GET /get_graph?item=" in line) :
             IP = line.split(" - - ")[0]
             item = unquote(line.split("get_graph?item=")[1].split("&SIZE_X=")[0])
             d = line.split(" [")[1].split("] ")[0]
 
             HEX = color(IP)
+
+            if prevday == 0:
+                res += "<center><b>" + d.split(" ")[0].replace("/", " ") + "</b></center><br />"
 
             if CENSOR:
                 parts = IP.split(".")
@@ -51,6 +58,11 @@ def stats_f(args):
             if CENSOR == False:
                 print(r)
             res += r + "\n"
+
+            day = d.split("/")[0]
+            if day != prevday and prevday != 0:
+                res += "<hr><center><b>" + d.split(" ")[0].replace("/", " ") + "</b></center><br />"
+            prevday = day
 
             count += 1
             IPs[IP] = 1
@@ -76,6 +88,11 @@ def stats_f(args):
                 print(r)
             res += r + "\n"
 
+            day = d.split("/")[0]
+            if day != prevday and prevday != 0:
+                res += "<hr><center><b>" + d.split(" ")[0].replace("/", " ") + "</b></center><br />"
+            prevday = day
+
             count += 1
             IPs[IP] = 1
 
@@ -98,6 +115,40 @@ def stats_f(args):
             if CENSOR == False:
                 print(r)
             res += r + "\n"
+
+            day = d.split("/")[0]
+            if day != prevday and prevday != 0:
+                res += "<hr><center><b>" + d.split(" ")[0].replace("/", " ") + "</b></center><br />"
+            prevday = day
+
+            count += 1
+            IPs[IP] = 1
+
+        if ("31.2.125.206" not in line) and ("35.178.138.241" not in line) and ("/log?target=" in line):
+            IP = line.split(" - - ")[0]
+            target = unquote(line.split("log?target=")[1].split("& HTTP")[0])
+            d = line.split(" [")[1].split("] ")[0]
+
+            HEX = color(IP)
+
+            if CENSOR:
+                parts = IP.split(".")
+                new_ip = parts[0] + ".*.*." + parts[3]
+
+                l = 40 - len(new_ip)*2
+
+                r = d + "&nbsp"*20 + "<span style='color: " + HEX + "'>" + new_ip + "</span>" + "&nbsp"*l + "<b>LOG: </b>" + target
+            else:
+                r = d + " "*10 + IP + " "*l + "<b>LOG: </b>" + target
+
+            if CENSOR == False:
+                print(r)
+            res += r + "\n"
+
+            day = d.split("/")[0]
+            if day != prevday and prevday != 0:
+                res += "<hr><center><b>" + d.split(" ")[0].replace("/", " ") + "</b></center><br />"
+            prevday = day
 
             count += 1
             IPs[IP] = 1

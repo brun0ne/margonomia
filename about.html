@@ -84,14 +84,10 @@
       }
     </style>
 
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NTRQZG13EZ"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-NTRQZG13EZ');
+    function log(x){
+      sendAJAX("log", {target: x});
+    }
     </script>
   </head>
 
@@ -125,7 +121,7 @@
       <br /><br />
 
       <div id="content2" class="content">
-        <a href="https://tipo.live/p/brun0ne" target="_blank"><span style="font-size: 2.3vh;">✨Wesprzyj mnie i serwery tej stronki✨</span></a>
+        <a href="https://tipo.live/p/brun0ne" target="_blank" onclick="log('donate')"><span style="font-size: 2.3vh;">✨Wesprzyj mnie i serwery tej stronki✨</span></a>
       </div>
 
       <br /><br />
@@ -135,6 +131,6 @@
       </div>
     </div>
 
-    <div id="footer">insanely coded by <a href="https://github.com/brun0ne" target="_blank">brun0ne</a> | <a href="https://tipo.live/p/brun0ne" target="_blank">✨donate✨</a></div>
+    <div id="footer">insanely coded by <a href="https://github.com/brun0ne" target="_blank" onclick="log('github')">brun0ne</a> | <a href="https://tipo.live/p/brun0ne" target="_blank" onclick="log('donate')">✨donate✨</a></div>
   </body>
 </html>
