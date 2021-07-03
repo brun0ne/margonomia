@@ -23,6 +23,8 @@ import importlib
 
 import subprocess
 
+import setInterval
+
 hostName = "0.0.0.0"
 serverPort = 443
 
@@ -36,8 +38,28 @@ def ftail(f, n):
     lines = proc.stdout.readlines()
     return lines
 
+def clear_IPs():
+    global IPs
+    print("Clearing IPs... ")
+    print(IPs)
+    IPs = {}
+
+IPs = {}
+IP_clear = setInterval.setInterval(60, clear_IPs)
+
 class MyServer(BaseHTTPRequestHandler):
     def do_GET(self):
+        global IPs
+        IP = self.client_address[0]
+
+        if IP not in IPs:
+            IPs[IP] = 0
+
+        IPs[IP] += 1
+
+        if IPs[IP] > 120:
+            return False
+
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.send_header("Access-Control-Allow-Origin", "https://aether.margonem.pl")
@@ -93,11 +115,7 @@ class MyServer(BaseHTTPRequestHandler):
 
             self.wfile.write(bytes("<body style='color:white;background:black;'>" + text + "</body>", "utf-8"))
         elif COMMAND == "stats":
-            if args["q"] != "abc123":
-                return False
-            IP = self.client_address[0]
-
-            if "77.112.20." not in IP:
+            if args["q"] != "qwe321":
                 return False
 
             importlib.reload(stats)
@@ -159,7 +177,7 @@ class MyServer(BaseHTTPRequestHandler):
 
         plt.tight_layout()
 
-        plt.gcf().subplots_adjust(left=0.05)
+        plt.gcf().subplots_adjust(left=0.16)
 
         ax.xaxis_date()
 

@@ -55,7 +55,7 @@
 
       #graph{
         margin: 2%;
-        margin-left: -0.5%;
+        margin-left: -12%;
         fill: white !important;
 
         display: flex;
@@ -334,6 +334,11 @@
         }, 1000*5);
       }
 
+      window.onresize = function(){
+        //loadGraph(document.getElementById("item_choice_button").innerHTML);
+        console.log("resized");
+      }
+
       setInterval(function(){
         var d = new Date();
         var m = d.getMinutes();
@@ -398,7 +403,7 @@
     </div>
 
     <div id="graph">
-      <object data="loading.svg" type="image/svg+xml" style="overflow-y: hidden; transform: scale(0.8); display: block; height: 300px; margin-top: 5%;"></object>
+      <object data="loading.svg" type="image/svg+xml" style="overflow-y: hidden; transform: scale(0.8); display: block; height: 300px; margin-top: 5%; margin-left: 12%;"></object>
     </div>
 
     <div id="footer">insanely coded by <a href="https://github.com/brun0ne" target="_blank" onclick="log('github')">brun0ne</a> | <a href="https://tipo.live/p/brun0ne" target="_blank" onclick="log('donate')">✨donate✨</a></div>

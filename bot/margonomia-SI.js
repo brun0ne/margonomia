@@ -331,6 +331,26 @@
 		{
 			name: "Łuskowa zbroja Thowara",
 			type: "zbroje"
+		},
+		{
+			name: "Buty władców grobowców",
+			type: "buty"
+		},
+		{
+			name: "Talizman chitynowych płytek",
+			type: "naszyjniki"
+		},
+		{
+			name: "Tarcza świtu baśni",
+			type: "tarcze"
+		},
+		{
+			name: "Topór kościeja",
+			type: "jednoręczne"
+		},
+		{
+			name: "Rdzeń Świadomości",
+			type: "naszyjniki"
 		}
 	];
 

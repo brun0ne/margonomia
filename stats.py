@@ -195,7 +195,11 @@ def stats_f(args):
 
         REST += "<b>RAM: </b>" + ram[:-1] + " %<br />"
 
-        return head + res.replace("\n", "<br />") + "<br /><b>Count: </b>" + str(count) + "<br /><b>Unique IPs: </b>" + str(len(IPs)) + "<br /><br />" + REST.replace("\n", "<br />") + tail
+        suggestions_file = open("/home/ec2-user/margonomia/suggestions.txt", "r")
+        suggestions = suggestions_file.readlines()
+        suggestions_file.close()
+
+        return head + res.replace("\n", "<br />") + "<br /><b>Count: </b>" + str(count) + "<br /><b>Unique IPs: </b>" + str(len(IPs)) + "<br /><b>Suggestions: </b>" + str(len(suggestions)) + "<br /><br />" + REST.replace("\n", "<br />") + tail
     else:
         return res + "\n!! Count: " + str(count) + "\n!! Unique IPs: " + str(len(IPs))
 
