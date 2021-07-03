@@ -17,8 +17,11 @@ import base64
 import os
 
 import stats
+import weird
 
 import importlib
+
+import subprocess
 
 hostName = "0.0.0.0"
 serverPort = 443
@@ -27,6 +30,11 @@ PATH = "/home/ec2-user/margonomia/"
 
 # BiegnacyDzik
 # PlywajacyKrolik
+
+def ftail(f, n):
+    proc = subprocess.Popen(['tail', '-n', str(n), f], stdout=subprocess.PIPE)
+    lines = proc.stdout.readlines()
+    return lines
 
 class MyServer(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -61,13 +69,35 @@ class MyServer(BaseHTTPRequestHandler):
         elif COMMAND == "suggestion":
             self.suggestion(args)
         elif COMMAND == "particles.min.js":
-            self.wfile.write(bytes(open(PATH + "particles.min.js").read(), "utf-8"))
+            file = open(PATH + "particles.min.js")
+            self.wfile.write(bytes(file.read(), "utf-8"))
+            file.close()
         elif COMMAND == "particles.config.json":
-            self.wfile.write(bytes(open(PATH + "particles.config.json").read(), "utf-8"))
+            file = open(PATH + "particles.config.json")
+            self.wfile.write(bytes(file.read(), "utf-8"))
+            file.close()
+        elif COMMAND == "loading.svg":
+            file = open(PATH + "loading.svg", "rb")
+            self.wfile.write(file.read())
+            file.close()
         elif COMMAND == "suggestions":
-            self.wfile.write(bytes("<html><head><meta charset='utf-8'></head><body>" + open(PATH + "suggestions.txt").read() + "</body></html>", "utf-8"))
+            self.wfile.write(bytes("<html><head><meta charset='utf-8'></head><body>" + open(PATH + "suggestions.txt").read().replace("\n", "<br />") + "</body></html>", "utf-8"))
+        elif COMMAND == "get_additions":
+            self.get_additions(args)
+        elif COMMAND == "weird":
+            if args["q"] != "very_weird_stuff":
+                return False
+
+            importlib.reload(weird)
+            text = weird.get_weird()
+
+            self.wfile.write(bytes("<body style='color:white;background:black;'>" + text + "</body>", "utf-8"))
         elif COMMAND == "stats":
             if args["q"] != "abc123":
+                return False
+            IP = self.client_address[0]
+
+            if "77.112.20." not in IP:
                 return False
 
             importlib.reload(stats)
@@ -97,6 +127,9 @@ class MyServer(BaseHTTPRequestHandler):
         file.close()
 
     def get_graph(self, args):
+        if args["item"] == None or args["SIZE_X"] == None or args["SIZE_Y"] == None:
+            return False
+
         file = open(PATH + "prices/" + args["item"] + ".prices", "r")
 
         dates = []
@@ -156,12 +189,26 @@ class MyServer(BaseHTTPRequestHandler):
         file.write(unquote(text.replace("\n", "")) + "\n")
         file.close()
 
+    def get_additions(self, args):
+        additions = ftail("/home/ec2-user/margonomia/additions.txt", 5)
+
+        res = ""
+
+        for n in additions:
+            res += n.decode("utf-8")
+
+        self.wfile.write(base64.b64encode(bytes(res, "utf-8")))
+
     def about(self, args):
-        HTML = open(PATH + "about.html", "r").read()
+        file = open(PATH + "about.html", "r")
+        HTML = file.read()
+        file.close()
         self.wfile.write(bytes(HTML, "utf-8"))
 
     def main(self, args):
-        HTML = open(PATH + "main.html", "r").read()
+        file = open(PATH + "main.html", "r")
+        HTML = file.read()
+        file.close()
         self.wfile.write(bytes(HTML, "utf-8"))
 
 

@@ -82,7 +82,7 @@
 			return false;
 	}
 
-	function getPrices() {
+	function getPrices(search) {
 		let raw_arr = Array.from(document.getElementsByClassName("buyout"));
 
 		let int_arr = [];
@@ -100,12 +100,19 @@
 
 			let price = parseInt(raw_arr[i].onclick.toString().split(", ")[1].split(")")[0]);
 
+			let name = raw_arr[i].parentElement.parentElement.children[1].innerHTML.split(" (")[0];
+
+			if (search.toLowerCase() !== name.toLowerCase()){
+				console.log("NAME MATCHING ERROR");
+				continue;
+			}
+
 			if(quantity != null){
 				price /= quantity;
 				price = Math.round(price);
 			}
 
-			console.log(price, quantity);
+			//console.log(price, quantity);
 
 			int_arr.push(price);
 		}
@@ -202,7 +209,9 @@
 
 			default:
 				console.log("setType(): wrong type");
+				return false;
 		}
+		return true;
 	}
 
 	/////////////////
@@ -244,10 +253,6 @@
 			type: "neutralne"
 		},
 		{
-			name: "Mąka",
-			type: "konsumpcyjne"
-		},
-		{
 			name: "Głowa zbira",
 			type: "neutralne"
 		},
@@ -262,10 +267,74 @@
 		{
 			name: "Maska złodzieja",
 			type: "hełmy"
+		},
+		{
+			name: "Magiczny kaptur Kotołaka",
+			type: "hełmy"
+		},
+		{
+			name: "Paszcza wilczych rytuałów",
+			type: "hełmy"
+		},
+		{
+			name: "Tnąca cięciwa umysłu",
+			type: "dystansowe"
+		},
+		{
+			name: "Dwoiste buty leśnego trapera",
+			type: "buty"
+		},
+		{
+			name: "Ochrona posępnego władcy",
+			type: "zbroje"
+		},
+		{
+			name: "Kamasze wypełnione wydzieliną",
+			type: "buty"
+		},
+		{
+			name: "Kaftan przesiąknięty flegmą",
+			type: "zbroje"
+		},
+		{
+			name: "Zbójeckie złotko",
+			type: "naszyjniki"
+		},
+		{
+			name: "Pancerz orczych lordów",
+			type: "zbroje"
+		},
+		{
+			name: "Karmazynowy chwyt demona",
+			type: "rękawice"
+		},
+		{
+			name: "Siła spełnienia",
+			type: "pierścienie"
+		},
+		{
+			name: "Osłona Choukkera",
+			type: "tarcze"
+		},
+		{
+			name: "Kapelusz bardzo mrocznego Patryka",
+			type: "hełmy"
+		},
+		{
+			name: "Zatruty sztylet bandyty",
+			type: "pomocnicze"
+		},
+		{
+			name: "Bransolety potęgi Patryka",
+			type: "rękawice"
+		},
+		{
+			name: "Łuskowa zbroja Thowara",
+			type: "zbroje"
 		}
 	];
 
-	const MINUTES = 15;
+	const MINUTES = 60;
 
 	const SERVER_URL = "https://margonomia.pl/";
 
@@ -287,7 +356,7 @@
 		const xhttp = new XMLHttpRequest();
 
 		xhttp.onload = function() {
-			console.log(this.responseText);
+			//console.log(this.responseText);
 		}
 
 		xhttp.open("GET", SERVER_URL + command + "?" + args_text, true);
@@ -330,29 +399,46 @@
 	}
 
 	function check(name) {
+		console.log("Trying: " + name);
+
 		setTimeout(
 			refreshAuction,
 			2000
 		);
 		setTimeout(function() {
-			let prices = getPrices();
+			let prices = getPrices(name);
+
+			if(prices === false)
+				return false;
 
 			// CHECK up to 3 pages
 			if(checkIfMore()){
 				setTimeout(function(){
-					prices = prices.concat(getPrices());
+					let prices2 = getPrices(name);
+
+					if(prices2 === false)
+						return false;
+
+					prices = prices.concat(prices2);
 
 					if(checkIfMore()){
 						setTimeout(function(){
-							prices = prices.concat(getPrices());
+							let prices3 = getPrices(name);
+
+							if(prices3 === false)
+								return false;
+
+							prices = prices.concat(prices3);
 						}, 500);
 					}
 				}, 500);
 			}
 
 			setTimeout(function(){
-				console.log(prices);
+				//console.log(prices);
 				let lowest_price = getLowestPrice(prices);
+
+				console.log("Saving price: " + lowest_price + " for item: " + name);
 
 				saveLowestPrice(name, lowest_price);
 			}, 1500);
@@ -361,7 +447,13 @@
 	}
 
 	function track(type, name) {
-		setType(type);
+		let s = setType(type);
+
+		if(s === false){
+			console.log("Wrong type, ABORT");
+			return false;
+		}
+
 		setTimeout(
 			function() {
 				setSearchValue(name);
@@ -392,9 +484,9 @@
 	function setup(search_list, interval) {
 		check_list(search_list);
 
-		setInterval(function() {
+		/*setInterval(function() {
 			check_list(search_list);
-		}, interval);
+		}, interval);*/
 	}
 
 	setTimeout(function() {
