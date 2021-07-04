@@ -57,7 +57,7 @@ class MyServer(BaseHTTPRequestHandler):
 
         IPs[IP] += 1
 
-        if IPs[IP] > 120:
+        if IPs[IP] > 80:
             return False
 
         self.send_response(200)

@@ -39,10 +39,10 @@ def stats_f(args):
     prevday = 0
 
     for line in lines:
-        if "27/Jun/2021" in line or "28/Jun/2021 01:10" in line: # filter out debug
+        if "27/Jun/2021" in line or "28/Jun/2021 01:10" in line or "no_stats" in line: # filter out debug
             continue
 
-        if ("31.2.125.206" not in line) and ("35.178.138.241" not in line) and ("66.249.65." not in line) and ("37.7.81.6" not in line) and ("66.249.75." not in line) and ("77.112.20.11" not in line) and ("GET /get_graph?item=" in line) :
+        if ("31.2.125.206" not in line) and ("35.178.138.241" not in line) and ("66.249.65." not in line) and ("37.7.81.6" not in line) and ("66.249.75." not in line) and ("77.112.20.11" not in line) and ("95.41.115." not in line) and ("GET /get_graph?item=" in line) :
             IP = line.split(" - - ")[0]
             item = unquote(line.split("get_graph?item=")[1].split("&SIZE_X=")[0])
             d = line.split(" [")[1].split("] ")[0]
@@ -105,7 +105,7 @@ def stats_f(args):
             count += 1
             IPs[IP] = 1
 
-        if ("31.2.125.206" not in line) and ("35.178.138.241" not in line) and ("77.112.20.11" not in line) and ("/about" in line):
+        if ("31.2.125.206" not in line) and ("35.178.138.241" not in line) and ("77.112.20.11" not in line) and (" /about" in line):
             IP = line.split(" - - ")[0]
             d = line.split(" [")[1].split("] ")[0]
 
@@ -118,7 +118,11 @@ def stats_f(args):
 
             if CENSOR:
                 parts = IP.split(".")
+                # try:
                 new_ip = parts[0] + ".*.*." + parts[3]
+                # except:
+                # print("ERR")
+                # print(parts)
 
                 l = 40 - len(new_ip)*2
 
