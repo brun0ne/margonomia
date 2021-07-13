@@ -351,6 +351,14 @@
 		{
 			name: "Rdzeń Świadomości",
 			type: "naszyjniki"
+		},
+		{
+			name: "Maska Akumu",
+			type: "hełmy"
+		},
+		{
+			name: "Naramienniki samca alfa",
+			type: "rękawice"
 		}
 	];
 

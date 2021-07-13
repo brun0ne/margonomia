@@ -1,6 +1,7 @@
 import http.server, ssl
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import time
+import datetime
 
 from urllib.parse import urlparse
 from urllib.parse import unquote
@@ -120,6 +121,10 @@ class MyServer(BaseHTTPRequestHandler):
 
             importlib.reload(stats)
             self.wfile.write(bytes(stats.stats_f(["", "-c"]), "utf-8"))
+        elif COMMAND == "new":
+            file = open(PATH + "new.html")
+            self.wfile.write(bytes(file.read(), "utf-8"))
+            file.close()
         elif COMMAND == "":
             self.main(args)
 
@@ -148,12 +153,30 @@ class MyServer(BaseHTTPRequestHandler):
         if args["item"] == None or args["SIZE_X"] == None or args["SIZE_Y"] == None:
             return False
 
+        if args["period"] == None:
+            args["period"] = "7"
+        args["period"] = int(args["period"])
+
         file = open(PATH + "prices/" + args["item"] + ".prices", "r")
 
         dates = []
         prices = []
 
         lines = file.readlines()
+
+        ### ADJUST FOR PERIOD
+        if args["period"] == 7:
+            today = datetime.date.today()
+            week_ago = today - datetime.timedelta(days=7)
+
+            INDEX = -1
+            for i in range(0, len(lines)):
+                if str(week_ago) in lines[i]:
+                    INDEX = i
+                    break
+
+            if INDEX != -1:
+                 lines = lines[INDEX:]
 
         for line in lines:
             line = json.loads(line)

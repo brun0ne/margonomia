@@ -42,7 +42,7 @@ def stats_f(args):
         if "27/Jun/2021" in line or "28/Jun/2021 01:10" in line or "no_stats" in line: # filter out debug
             continue
 
-        if ("31.2.125.206" not in line) and ("35.178.138.241" not in line) and ("66.249.65." not in line) and ("37.7.81.6" not in line) and ("66.249.75." not in line) and ("77.112.20.11" not in line) and ("95.41.115." not in line) and ("GET /get_graph?item=" in line) :
+        if ("31.2.125.206" not in line) and ("35.178.138.241" not in line) and ("66.249.65." not in line) and ("37.7.81.6" not in line) and ("66.249.75." not in line) and ("77.112.20.11" not in line) and ("95.41.115." not in line) and ("37.249.106." not in line) and ("31.0.24.22" not in line) and ("GET /get_graph?item=" in line) :
             IP = line.split(" - - ")[0]
             item = unquote(line.split("get_graph?item=")[1].split("&SIZE_X=")[0])
             d = line.split(" [")[1].split("] ")[0]
@@ -137,7 +137,7 @@ def stats_f(args):
             count += 1
             IPs[IP] = 1
 
-        if ("31.2.125.206" not in line) and ("35.178.138.241" not in line) and ("/log?target=" in line):
+        if ("31.2.125.206" not in line) and ("35.178.138.241" not in line) and ("37.249.106." not in line) and ("/log?target=" in line):
             IP = line.split(" - - ")[0]
             target = unquote(line.split("log?target=")[1].split("& HTTP")[0])
             d = line.split(" [")[1].split("] ")[0]

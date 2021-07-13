@@ -224,7 +224,7 @@
 
         document.getElementById("item_choice_button").innerHTML = req;
 
-        sendAJAX("get_graph", {item: req, SIZE_X: SIZE_X, SIZE_Y: SIZE_Y}, function(responseText){
+        sendAJAX("get_graph", {item: req, SIZE_X: SIZE_X, SIZE_Y: SIZE_Y, period: PERIOD}, function(responseText){
           let parts = atob(responseText).split("<script>");
 
           document.getElementById("graph").innerHTML = parts[0];
@@ -315,6 +315,25 @@
         return array[Math.floor(Math.random() * array.length)];
       }
 
+      let PERIOD = 7;
+      function changePeriod(x){
+        if(x === 0){ // ALL
+          PERIOD = x;
+          document.getElementById("period_choice_button").innerHTML = "Cały okres";
+        }
+        else if (x === 7){ // LAST 7 DAYS
+          PERIOD = x;
+          document.getElementById("period_choice_button").innerHTML = "Ostatnie 7 dni";
+        }
+        else {
+          return false;
+        }
+
+        loadGraph(document.getElementById("item_choice_button").innerHTML);
+
+        return true;
+      }
+
       window.onload = function(){
         getItems();
 
@@ -396,6 +415,24 @@
 
         </ul>
       </div>
+      &nbsp;
+      <div class="btn-group">
+        <button id="period_choice_button" data-bs-display="static" data-bs-flip="false" type="button" class="btn btn-warning dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+          Ostatnie 7 dni
+        </button>
+        <ul class="dropdown-menu" id="period_choice_list" style="max-height: 300px; overflow-y: hidden; overflow-x: hidden;">
+          <li><a class="dropdown-item" href="#" onclick="changePeriod(7)">Ostatnie 7 dni</a></li>
+          <li><a class="dropdown-item" href="#" onclick="changePeriod(0)">Cały okres</a></li>
+        </ul>
+      </div>
+      <!--&nbsp;
+      <div>
+        <button type="button" class="btn btn-success">
+          <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
+            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"></path>
+          </svg>
+        </button>
+      </div>-->
     </div>
 
     <div id="additions" class="fade">
