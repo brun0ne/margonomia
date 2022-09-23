@@ -1,0 +1,6 @@
+webserver/prices
+webserver/__pycache__
+bot/.idea
+bot/last-run
+bot/geckodriver.log
+*.pyc

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Margonomia
-// @version      1.0
-// @description  TODO
+// @version      2.0
+// @description  Prices Bot
 // @author       Brun0ne
 // @match        http://*.margonem.com/
 // @match        https://*.margonem.com/
@@ -14,11 +14,15 @@
 (function() {
 	'use strict';
 
+	const MINUTES = 60;
+	const SERVER_URL = "http://localhost:8881/";
+	const INTERVAL_MODE = true;
+
 	function simulateKeyPress(character, delay) {
 		setTimeout(function(){
-  		jQuery.event.trigger({ type : 'keypress', which : character.charCodeAt(0) });
+  			jQuery.event.trigger({ type : 'keypress', which : character.charCodeAt(0) });
 		}, randint(100, 1500) + delay*1000);
-  }
+  	}
 
 	function leave() {
 		let myWindow = window.open("", "_self");
@@ -44,7 +48,7 @@
 			}, 1000*7);
 
 			setTimeout(function(){
-				if(document.getElementById("au1") == null || document.getElementById("auctions").style.display !== "block"){
+				if(get_auction(1) == null){
 					window.location.reload();
 				}
 			}, 1000*9)
@@ -54,6 +58,7 @@
 					check_list(search_list);
 				}
 				catch(e){
+					console.log(e); 
 					window.location.reload();
 				}
 			}, 1000*11);
@@ -61,29 +66,8 @@
 		}, randint(5*1000, 10*1000));
 	}
 
-	function checkIfMore(){
-		let all_next = document.getElementsByClassName("next");
-		let next_button;
-
-		for(let i = 0; i < all_next.length; i++){
-			if(all_next[i].onclick != null){
-				if(all_next[i].onclick.toString().includes("ah_page")){
-					next_button = all_next[i];
-					break;
-				}
-			}
-		}
-
-		if(next_button != null){
-			next_button.click();
-			return true;
-		}
-		else
-			return false;
-	}
-
 	function getPrices(search) {
-		let raw_arr = Array.from(document.getElementsByClassName("buyout"));
+		let raw_arr = Array.from(document.getElementsByClassName("auction-table")[0].childNodes);
 
 		let int_arr = [];
 
@@ -91,16 +75,44 @@
 			return [];
 
 		for (let i = 0; i < raw_arr.length; i++) {
-			let quantity_el_list = raw_arr[i].parentElement.parentElement.getElementsByTagName("small");
+			let quantity_el_list = raw_arr[i].getElementsByTagName("small");
 			let quantity;
 
 			if(quantity_el_list.length > 0){
 				quantity = parseInt(quantity_el_list[0].innerHTML);
 			}
 
-			let price = parseInt(raw_arr[i].onclick.toString().split(", ")[1].split(")")[0]);
+			// Parsing
+			let price = raw_arr[i].getElementsByClassName("auction-cost-label");
 
-			let name = raw_arr[i].parentElement.parentElement.children[1].innerHTML.split(" (")[0];
+			if(price.length == 0)
+				continue;
+			else	
+				price = price[0].innerHTML;
+
+			if(price.replaceAll(" ", "") === "") // only auction, no buy now
+				continue;
+
+			let last_char = price.slice(-1); // k, m, g
+			let num_str;
+
+			if(["k", "m", "g"].includes(last_char))
+				num_str = price.slice(0, -1); // everything before
+			else
+				num_str = price;
+
+			if(price.includes("+")) // this item is selling for + SŁ
+				continue;
+
+			let mult = 1;
+			if (last_char == "k") mult = 1000; // 10^3
+			else if (last_char == "m") mult = 1000000; // 10^6
+			else if (last_char == "g") mult = 1000000000; // 10^9
+
+			price = parseFloat(num_str) * mult;
+
+			// Item name
+			let name = raw_arr[i].getElementsByClassName("auction-item-name")[0].innerHTML.split(" (")[0];
 
 			if (search.toLowerCase() !== name.toLowerCase()){
 				console.log("NAME MATCHING ERROR");
@@ -111,8 +123,6 @@
 				price /= quantity;
 				price = Math.round(price);
 			}
-
-			//console.log(price, quantity);
 
 			int_arr.push(price);
 		}
@@ -131,80 +141,79 @@
 		return lowest;
 	}
 
-	function getSearchValue() {
-		let text = document.getElementById("ah_search").value;
-		return text;
-	}
-
 	function setSearchValue(text) {
-		document.getElementById("ah_search").value = text;
+		document.querySelectorAll('[placeholder="Nazwa przedmiotu"]')[0].value = text;
 	}
 
 	function refreshAuction() {
-		document.querySelector("[onclick='ah_apply()']").click()
+		document.querySelectorAll('[name="Odśwież"]')[0].click();
 	}
+
+	function get_auction(number){
+        return document.getElementsByClassName("auction-category-" + number)[0];
+    }
 
 	function setType(type) {
 		switch (type) {
 			case "jednoręczne":
-				document.getElementById("au1").click()
+				get_auction(1).click()
 				break;
 			case "dwuręczne":
-				document.getElementById("au2").click()
+				get_auction(2).click()
 				break;
 			case "półtoraręczne":
-				document.getElementById("au3").click()
+				get_auction(3).click()
 				break;
 			case "dystansowe":
-				document.getElementById("au4").click()
+				get_auction(4).click()
 				break;
 			case "pomocnicze":
-				document.getElementById("au5").click()
+				get_auction(5).click()
 				break;
 			case "różdżki":
-				document.getElementById("au6").click()
+				get_auction(6).click()
 				break;
 			case "laski":
-				document.getElementById("au7").click()
+				get_auction(7).click()
 				break;
 			case "zbroje":
-				document.getElementById("au8").click()
+				get_auction(8).click()
 				break;
 			case "hełmy":
-				document.getElementById("au9").click()
+				get_auction(9).click()
 				break;
 			case "buty":
-				document.getElementById("au10").click()
+				get_auction(10).click()
 				break;
 			case "rękawice":
-				document.getElementById("au11").click()
+				get_auction(11).click()
 				break;
 			case "pierścienie":
-				document.getElementById("au12").click()
+				get_auction(12).click()
 				break;
 			case "naszyjniki":
-				document.getElementById("au13").click()
+				get_auction(13).click()
 				break;
 			case "tarcze":
-				document.getElementById("au14").click()
+				get_auction(14).click()
 				break;
 			case "neutralne":
-				document.getElementById("au15").click()
+				get_auction(15).click()
 				break;
 			case "konsumpcyjne":
-				document.getElementById("au16").click()
+				get_auction(16).click()
 				break;
 			case "strzały":
-				document.getElementById("au21").click()
+				get_auction(21).click()
 				break;
 			case "talizmany":
-				document.getElementById("au22").click()
+				get_auction(22).click()
 				break;
-			case "konsumpcyjne":
-				document.getElementById("au23").click()
+			case "torby":
+				get_auction(24).click()
 				break;
-			case "konsumpcyjne":
-				document.getElementById("au99").click()
+			case "recepty":
+				get_auction(27).click()
 				break;
 
 			default:
@@ -362,10 +371,6 @@
 		}
 	];
 
-	const MINUTES = 60;
-
-	const SERVER_URL = "https://margonomia.pl/";
-
 	function randint(min, max) {
 		min = Math.ceil(min);
 		max = Math.floor(max);
@@ -406,6 +411,14 @@
 			lowest_price = 0;
 		}
 
+		let to_print;
+		if (lowest_price == 0)
+			to_print = "NOT_AVAIL";
+		else
+			to_print = lowest_price;
+
+		print_line("Sending price: " + to_print + " for item " + name.substring(0, 10) + "..");
+
 		let timestamp = new Date().toLocaleString("pl-PL", {hour12: false, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit"}).replaceAll(".", "-").replace(",", "").split(" ");
 
 		var time = timestamp[1];
@@ -422,7 +435,7 @@
 			search: name,
 			price: lowest_price,
 			time: formattedDate,
-			pass: "asmxSdnaxlD231"
+			pass: "TEST"
 		});
 	}
 
@@ -433,52 +446,39 @@
 			refreshAuction,
 			2000
 		);
+
+		function scroll_down_auction_list(){
+			document.getElementsByClassName("scroll-pane")[0].scrollIntoView(false);
+		}
+
+		// this should get everything loaded
+		setTimeout(scroll_down_auction_list, 3000);
+		setTimeout(scroll_down_auction_list, 3100);
+		setTimeout(scroll_down_auction_list, 3200);
+		setTimeout(scroll_down_auction_list, 3300);
+		setTimeout(scroll_down_auction_list, 3400);
+		setTimeout(scroll_down_auction_list, 3500);
+
 		setTimeout(function() {
 			let prices = getPrices(name);
 
 			if(prices === false)
 				return false;
 
-			// CHECK up to 3 pages
-			if(checkIfMore()){
-				setTimeout(function(){
-					let prices2 = getPrices(name);
-
-					if(prices2 === false)
-						return false;
-
-					prices = prices.concat(prices2);
-
-					if(checkIfMore()){
-						setTimeout(function(){
-							let prices3 = getPrices(name);
-
-							if(prices3 === false)
-								return false;
-
-							prices = prices.concat(prices3);
-						}, 500);
-					}
-				}, 500);
-			}
-
 			setTimeout(function(){
-				//console.log(prices);
 				let lowest_price = getLowestPrice(prices);
-
-				console.log("Saving price: " + lowest_price + " for item: " + name);
 
 				saveLowestPrice(name, lowest_price);
 			}, 1500);
 
-		}, 3000);
+		}, 4000);
 	}
 
 	function track(type, name) {
 		let s = setType(type);
 
 		if(s === false){
-			console.log("Wrong type, ABORT");
+			print_line("Wrong type!");
 			return false;
 		}
 
@@ -491,7 +491,8 @@
 	}
 
 	function check_list(search_list) {
-		if(document.getElementById("au1") == null || document.getElementById("auctions").style.display !== "block"){
+		if(get_auction(1) == null){
+		    print_line("Stabilizing...");
 			restabilize(search_list);
 			return false;
 		}
@@ -507,18 +508,30 @@
 				check(name);
 			}, 5500*(i+1));
 		}
+
+		setTimeout(function() { // end
+			document.innerHTML = "ended";
+
+			for (var i = 1; i < 99999; i++)
+        		window.clearInterval(i);
+		}, 5500*(search_list.length+1));
 	}
 
 	function setup(search_list, interval) {
+		// run once
 		check_list(search_list);
-
-		/*setInterval(function() {
-			check_list(search_list);
-		}, interval);*/
+		if (INTERVAL_MODE){
+			setInterval(function() { // run price grabbing periodically
+				print_line("Interval mode: starting run")
+				check_list(search_list);
+			}, interval);
+		}
 	}
 
+	setup_display();
+	print_line("Initializing Margonomia...");
 	setTimeout(function() {
-		console.log("Margonomia running");
+		print_line("Margonomia started!");
 		setup(SEARCH, MINUTES * 60 * 1000);
 	}, 10 * 1000);
 
@@ -528,4 +541,26 @@
 			leave();
 		}
 	}, 3*1000);
+
+	/////////////////////////
+	// DISPLAY
+
+	function setup_display(){
+		let div = document.createElement("div");
+		div.style.cssText = "position: fixed; top: 1%; left: 1%; width: 400px; height: 100px; background: black; overflow-y: auto; font-family: Consolas, Consolas; font-size: 1.2vh; z-index: 99;";
+		div.id = "margonomia_display";
+		document.body.append(div);
+	}
+
+	function print_line(text){
+		let span  = document.createElement("span");
+		span.append(text);
+		let br = document.createElement("br");
+
+		const display = document.getElementById("margonomia_display");
+		display.append(span);
+		display.append(br);
+
+		span.scrollIntoView();
+	}
 })();

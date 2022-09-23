@@ -9,37 +9,47 @@ import time
 import os
 
 chrome_options = Options()
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--no-sandbox")
+# chrome_options.add_argument("--headless")
+# chrome_options.add_argument("--no-sandbox")
 
-PASSWORD = "hkaslwans123"
+USERNAME = "username"
+PASSWORD = "password"
 
 # dc = DesiredCapabilities.CHROME
 # dc['goog:loggingPrefs'] = { 'browser':'ALL' }
 
-driver = webdriver.Chrome(executable_path="/home/ec2-user/margonomia/bot/chromedriver", options=chrome_options)
+driver = webdriver.Chrome(executable_path="chromedriver.exe", options=chrome_options)
 
 driver.get("http://margonem.pl")
 
 
 def log_in():
+    login_page_button = driver.find_elements_by_xpath("//*[contains(text(), 'Zaloguj się')]")[0]
+    ActionChains(driver).click(login_page_button).perform()
+
     login = driver.find_element_by_name("login")
-    login.send_keys("BiegnacyDzik")
+    login.send_keys(USERNAME)
 
     password = driver.find_element_by_name("password")
     password.send_keys(PASSWORD)
 
     time.sleep(0.5)
 
-    submit_button = driver.find_element_by_xpath('//input[@value="Zaloguj się"]')
+    submit_button = driver.find_element_by_id("js-login-btn")
     ActionChains(driver).click(submit_button).perform()
+    ActionChains(driver).click(submit_button).perform()
+
+    time.sleep(3)
 
 
 def join():
-    join_button = driver.find_elements_by_class_name("enter-game")[0]
-    ActionChains(driver).click(join_button).perform()
+    try:
+        join_button = driver.find_elements_by_class_name("enter-game")[0]
+        ActionChains(driver).click(join_button).perform()
+    except IndexError:
+        print("This weird bug with auto-join")
 
-    time.sleep(0.5)
+    time.sleep(2)
 
     driver.delete_cookie("interface")
     driver.add_cookie({"name": "interface", "value": "si"})
@@ -50,7 +60,7 @@ def join():
 
 
 def bot():
-    file = open("/home/ec2-user/margonomia/bot/margonomia-SI.js", "r", encoding="utf8")
+    file = open("margonomia-SI.js", "r", encoding="utf8")
     script = file.read()
     file.close()
     driver.execute_script(script)
@@ -59,6 +69,11 @@ def bot():
 def quit_driver_and_reap_children(driver):
     print('Quitting session: ' + str(driver.session_id))
     driver.quit()
+
+    if os.name == 'nt':
+        return
+
+    # on linux make sure all processes are cleared
     try:
         pid = True
         while pid:

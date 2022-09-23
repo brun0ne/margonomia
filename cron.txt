@@ -1,5 +1,0 @@
-*/15 0-2,6-23 * * * nohup /home/ec2-user/margonomia/bot/bot.sh &
-*/15 0-2,6-23 * * * touch /home/ec2-user/margonomia/bot/last-run
-0 5 * * * cd /home/ec2-user/margonomia/ && /bin/bash /home/ec2-user/margonomia/server.sh
-* * * * * python3 /home/ec2-user/margonomia/test.py
-* * * * * cd /home/ec2-user/margonomia/ && /bin/bash memory.sh
