@@ -36,5 +36,7 @@ $ python3 server.py
 ```
 ## Ethics
 Garmory (the company running Margonem) generally doesn't like bots, but this one was made only to gather anonymous, public data which can be later used for same academic studies. It doesn't automate any relevant part of the game and doesn't use up much of Margonem's resources - it's only one player checking auctions once in a while.
+
+In any case, bots of any kind are not allowed in Margonem, so if you run Margonomia, you do it at your own responsibility and risk a ban.
 ## License
-This code is available on MIT License, so feel free to fork / use this code however you like.
+This code is available on MIT License, so feel free to fork or use this code however you like.
