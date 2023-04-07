@@ -19,6 +19,7 @@ Install [Python](https://www.python.org/downloads/). This code was tested on **P
 To run the bot, install [Chrome](https://www.google.com/intl/pl_pl/chrome/) and put the right version of [chromedriver](https://chromedriver.chromium.org/) into /bot.
 To start it, run inside /bot:
 ```console
+$ python3 -m pip install -r requirements.txt
 $ python3 bot.py
 ```
 
