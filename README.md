@@ -40,4 +40,4 @@ Garmory (the company running Margonem) generally doesn't like bots, but this one
 
 In any case, bots of any kind are not allowed in Margonem, so if you run Margonomia, you do it at your own responsibility and risk a ban.
 ## License
-This code is available on MIT License, so feel free to fork or use this code however you like.
+This project is licensed under the terms of the MIT license.
